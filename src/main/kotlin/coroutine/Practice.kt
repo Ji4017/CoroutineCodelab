@@ -16,7 +16,15 @@ fun main() {
 
 suspend fun getWeatherReport() = coroutineScope {
     val forecast = async { getForecast() }
-    val temperature = async { getTemperature() }
+    val temperature = async {
+        try {
+            getTemperature()
+        } catch (e: AssertionError) {
+            println("Caught exception $e")
+            "{ No temperature found }"
+        }
+    }
+
     "${forecast.await()} ${temperature.await()}"
 }
 
@@ -26,6 +34,7 @@ suspend fun getForecast(): String {
 }
 
 suspend fun getTemperature(): String {
-    delay(1000)
+    delay(500)
+    throw AssertionError("Temperature is invalid")
     return "30\u00b0C"
 }
